@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { renderHook, act, waitFor } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { renderHook, act } from '@testing-library/react';
 import { useDocumentUpload } from '../useDocumentUpload';
 import { VerificationResult } from '@domain/entities';
 import { FileTooLargeError } from '@domain/errors';
@@ -34,9 +34,22 @@ function createMockVerificationResult(): VerificationResult {
   });
 }
 
+function createDeferredPromise<T>() {
+  let resolve: (value: T) => void;
+  const promise = new Promise<T>((res) => {
+    resolve = res;
+  });
+  return { promise, resolve: resolve! };
+}
+
 describe('useDocumentUpload', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   it('should initialize with idle state', () => {
@@ -48,7 +61,13 @@ describe('useDocumentUpload', () => {
     expect(result.current.selectedFile).toBeNull();
   });
 
-  it('should select file', () => {
+  it('should auto-start upload on file selection', async () => {
+    const deferred = createDeferredPromise<{ success: boolean; data?: VerificationResult }>();
+    const { container } = await import('@infrastructure/di');
+    vi.mocked(container.verifyDocument).mockReturnValue({
+      execute: vi.fn().mockReturnValue(deferred.promise),
+    });
+
     const { result } = renderHook(() => useDocumentUpload());
     const file = createMockFile();
 
@@ -57,10 +76,33 @@ describe('useDocumentUpload', () => {
     });
 
     expect(result.current.selectedFile).toBe(file);
-    expect(result.current.status).toBe('idle');
+    expect(result.current.status).toBe('uploading');
   });
 
-  it('should upload file successfully', async () => {
+  it('should transition to processing state', async () => {
+    const deferred = createDeferredPromise<{ success: boolean; data?: VerificationResult }>();
+    const { container } = await import('@infrastructure/di');
+    vi.mocked(container.verifyDocument).mockReturnValue({
+      execute: vi.fn().mockReturnValue(deferred.promise),
+    });
+
+    const { result } = renderHook(() => useDocumentUpload());
+    const file = createMockFile();
+
+    act(() => {
+      result.current.selectFile(file);
+    });
+
+    expect(result.current.status).toBe('uploading');
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(500);
+    });
+
+    expect(result.current.status).toBe('processing');
+  });
+
+  it('should complete upload successfully', async () => {
     const mockResult = createMockVerificationResult();
     const { container } = await import('@infrastructure/di');
     vi.mocked(container.verifyDocument).mockReturnValue({
@@ -75,7 +117,7 @@ describe('useDocumentUpload', () => {
     });
 
     await act(async () => {
-      await result.current.upload();
+      await vi.runAllTimersAsync();
     });
 
     expect(result.current.status).toBe('success');
@@ -100,11 +142,11 @@ describe('useDocumentUpload', () => {
     });
 
     await act(async () => {
-      await result.current.upload();
+      await vi.runAllTimersAsync();
     });
 
     expect(result.current.status).toBe('error');
-    expect(result.current.error).toBe('Upload failed');
+    expect(result.current.error).toBe('Un problème est survenu. Réessayez dans quelques instants.');
     expect(result.current.result).toBeNull();
   });
 
@@ -125,22 +167,11 @@ describe('useDocumentUpload', () => {
     });
 
     await act(async () => {
-      await result.current.upload();
+      await vi.runAllTimersAsync();
     });
 
     expect(result.current.status).toBe('error');
     expect(result.current.error).toBe('File too large');
-  });
-
-  it('should set error when uploading without file', async () => {
-    const { result } = renderHook(() => useDocumentUpload());
-
-    await act(async () => {
-      await result.current.upload();
-    });
-
-    expect(result.current.status).toBe('error');
-    expect(result.current.error).toBe('Aucun fichier sélectionné');
   });
 
   it('should reset state', async () => {
@@ -158,7 +189,7 @@ describe('useDocumentUpload', () => {
     });
 
     await act(async () => {
-      await result.current.upload();
+      await vi.runAllTimersAsync();
     });
 
     expect(result.current.status).toBe('success');
@@ -171,38 +202,5 @@ describe('useDocumentUpload', () => {
     expect(result.current.result).toBeNull();
     expect(result.current.error).toBeNull();
     expect(result.current.selectedFile).toBeNull();
-  });
-
-  it('should set uploading status during upload', async () => {
-    const { container } = await import('@infrastructure/di');
-    let resolvePromise: (value: unknown) => void;
-    const promise = new Promise((resolve) => {
-      resolvePromise = resolve;
-    });
-
-    vi.mocked(container.verifyDocument).mockReturnValue({
-      execute: vi.fn().mockReturnValue(promise),
-    });
-
-    const { result } = renderHook(() => useDocumentUpload());
-    const file = createMockFile();
-
-    act(() => {
-      result.current.selectFile(file);
-    });
-
-    let uploadPromise: Promise<void>;
-    act(() => {
-      uploadPromise = result.current.upload();
-    });
-
-    expect(result.current.status).toBe('uploading');
-
-    await act(async () => {
-      resolvePromise!({ success: true, data: createMockVerificationResult() });
-      await uploadPromise;
-    });
-
-    expect(result.current.status).toBe('success');
   });
 });

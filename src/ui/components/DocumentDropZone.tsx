@@ -25,13 +25,13 @@ export function DocumentDropZone({
 
       if (!ContentType.isSupported(file.type)) {
         setValidationError(
-          `Type de fichier non supporté. Formats acceptés : PDF, PNG, JPEG, WebP`
+          'Format non pris en charge. Utilisez PDF, JPG ou PNG.'
         );
         return;
       }
 
       if (file.size > FileSize.maxBytes) {
-        setValidationError(`Fichier trop volumineux. Taille maximale : 10 Mo`);
+        setValidationError('Fichier trop volumineux (max 10 Mo).');
         return;
       }
 
@@ -79,6 +79,8 @@ export function DocumentDropZone({
       if (file) {
         validateAndSelectFile(file);
       }
+      // Reset input to allow selecting same file again
+      event.target.value = '';
     },
     [validateAndSelectFile]
   );
@@ -104,8 +106,9 @@ export function DocumentDropZone({
       <div
         role="button"
         tabIndex={isDisabled ? -1 : 0}
-        aria-label="Zone de dépôt de document"
+        aria-label="Zone de dépôt de document. Appuyez sur Entrée ou Espace pour choisir un fichier."
         aria-disabled={isDisabled}
+        aria-describedby={validationError ? 'dropzone-error' : undefined}
         onClick={handleClick}
         onKeyDown={handleKeyDown}
         onDragOver={handleDragOver}
@@ -113,9 +116,10 @@ export function DocumentDropZone({
         onDrop={handleDrop}
         className={`
           relative flex flex-col items-center justify-center
-          w-full h-48 px-6 py-8
+          w-full min-h-[200px] px-6 py-8
           border-2 border-dashed rounded-xl
           transition-all duration-200 ease-in-out
+          motion-reduce:transition-none
           ${
             isDisabled
               ? 'border-gray-200 bg-gray-50 cursor-not-allowed'
@@ -123,12 +127,13 @@ export function DocumentDropZone({
                 ? 'border-primary-500 bg-primary-50 cursor-copy'
                 : 'border-gray-300 bg-white hover:border-primary-400 hover:bg-gray-50 cursor-pointer'
           }
+          focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2
         `}
       >
         <input
           ref={inputRef}
           type="file"
-          accept=".pdf,.png,.jpg,.jpeg,.webp,application/pdf,image/png,image/jpeg,image/webp"
+          accept="application/pdf,image/jpeg,image/png"
           onChange={handleInputChange}
           disabled={isDisabled}
           className="sr-only"
@@ -137,7 +142,7 @@ export function DocumentDropZone({
 
         <div className="flex flex-col items-center text-center">
           <svg
-            className={`w-12 h-12 mb-3 ${
+            className={`w-12 h-12 mb-4 motion-reduce:transition-none transition-colors ${
               isDragOver ? 'text-primary-500' : 'text-gray-400'
             }`}
             fill="none"
@@ -154,7 +159,7 @@ export function DocumentDropZone({
           </svg>
 
           {selectedFile ? (
-            <div className="space-y-1">
+            <div className="space-y-2">
               <p className="text-sm font-medium text-gray-900">
                 {selectedFile.name}
               </p>
@@ -162,19 +167,46 @@ export function DocumentDropZone({
                 {(selectedFile.size / 1024 / 1024).toFixed(2)} Mo
               </p>
             </div>
+          ) : isDragOver ? (
+            <p className="text-sm font-medium text-primary-600">
+              Relâchez pour déposer
+            </p>
           ) : (
-            <div className="space-y-1">
+            <div className="space-y-2">
               <p className="text-sm font-medium text-gray-700">
                 Déposer un document
               </p>
-              <p className="text-xs text-gray-500">(PDF ou image)</p>
+              <p className="text-xs text-gray-500">
+                PDF, JPG, PNG — max 10 Mo
+              </p>
             </div>
           )}
         </div>
       </div>
 
+      {!selectedFile && !isDragOver && (
+        <div className="mt-3 text-center">
+          <button
+            type="button"
+            onClick={handleClick}
+            disabled={isDisabled}
+            className={`
+              text-sm font-medium text-primary-600 hover:text-primary-700
+              focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 rounded
+              ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}
+            `}
+          >
+            Choisir un fichier
+          </button>
+        </div>
+      )}
+
       {validationError && (
-        <p className="mt-2 text-sm text-red-600" role="alert">
+        <p
+          id="dropzone-error"
+          className="mt-3 text-sm text-red-600 text-center"
+          role="alert"
+        >
           {validationError}
         </p>
       )}

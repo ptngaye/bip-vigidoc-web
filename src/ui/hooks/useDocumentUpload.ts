@@ -1,11 +1,11 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import type { VerificationResult } from '@domain/entities';
 import { DomainError } from '@domain/errors';
 import { container } from '@infrastructure/di';
 
-export type UploadStatus = 'idle' | 'validating' | 'uploading' | 'success' | 'error';
+export type UploadStatus = 'idle' | 'uploading' | 'processing' | 'success' | 'error';
 
 export interface UseDocumentUploadState {
   status: UploadStatus;
@@ -16,7 +16,6 @@ export interface UseDocumentUploadState {
 
 export interface UseDocumentUploadActions {
   selectFile: (file: File) => void;
-  upload: () => Promise<void>;
   reset: () => void;
 }
 
@@ -34,48 +33,59 @@ export function useDocumentUpload(): UseDocumentUploadReturn {
 
   const selectFile = useCallback((file: File) => {
     setState({
-      status: 'idle',
+      status: 'uploading',
       result: null,
       error: null,
       selectedFile: file,
     });
   }, []);
 
-  const upload = useCallback(async () => {
-    if (!state.selectedFile) {
-      setState((prev) => ({
-        ...prev,
-        status: 'error',
-        error: 'Aucun fichier sélectionné',
-      }));
+  useEffect(() => {
+    if (state.status !== 'uploading' || !state.selectedFile) {
       return;
     }
 
-    setState((prev) => ({ ...prev, status: 'uploading', error: null }));
+    let cancelled = false;
 
-    const verifyDocument = container.verifyDocument();
-    const result = await verifyDocument.execute({ file: state.selectedFile });
+    const performVerification = async () => {
+      await new Promise((resolve) => setTimeout(resolve, 500));
 
-    if (result.success) {
-      setState((prev) => ({
-        ...prev,
-        status: 'success',
-        result: result.data,
-        error: null,
-      }));
-    } else {
-      const errorMessage =
-        result.error instanceof DomainError
-          ? result.error.message
-          : result.error.message;
+      if (cancelled) return;
 
-      setState((prev) => ({
-        ...prev,
-        status: 'error',
-        error: errorMessage,
-      }));
-    }
-  }, [state.selectedFile]);
+      setState((prev) => ({ ...prev, status: 'processing' }));
+
+      const verifyDocument = container.verifyDocument();
+      const result = await verifyDocument.execute({ file: state.selectedFile! });
+
+      if (cancelled) return;
+
+      if (result.success) {
+        setState((prev) => ({
+          ...prev,
+          status: 'success',
+          result: result.data,
+          error: null,
+        }));
+      } else {
+        const errorMessage =
+          result.error instanceof DomainError
+            ? result.error.message
+            : 'Un problème est survenu. Réessayez dans quelques instants.';
+
+        setState((prev) => ({
+          ...prev,
+          status: 'error',
+          error: errorMessage,
+        }));
+      }
+    };
+
+    performVerification();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [state.status, state.selectedFile]);
 
   const reset = useCallback(() => {
     setState(initialState);
@@ -84,7 +94,6 @@ export function useDocumentUpload(): UseDocumentUploadReturn {
   return {
     ...state,
     selectFile,
-    upload,
     reset,
   };
 }

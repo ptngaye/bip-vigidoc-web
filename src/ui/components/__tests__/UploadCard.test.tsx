@@ -1,8 +1,16 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { render, screen, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { UploadCard } from '../UploadCard';
 import { createMockFile } from '../../../test/createMockFile';
+
+const mockPush = vi.fn();
+
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({
+    push: mockPush,
+  }),
+}));
 
 vi.mock('@infrastructure/di', () => ({
   container: {
@@ -18,9 +26,22 @@ vi.mock('@infrastructure/di', () => ({
   },
 }));
 
+function createDeferredPromise<T>() {
+  let resolve: (value: T) => void;
+  const promise = new Promise<T>((res) => {
+    resolve = res;
+  });
+  return { promise, resolve: resolve! };
+}
+
 describe('UploadCard', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   it('should render title and description', () => {
@@ -28,7 +49,7 @@ describe('UploadCard', () => {
 
     expect(screen.getByText('Vous avez déjà un document ?')).toBeInTheDocument();
     expect(
-      screen.getByText("Vérifiez l'authenticité d'un document administratif français.")
+      screen.getByText('Déposez-le pour vérifier son authenticité.')
     ).toBeInTheDocument();
   });
 
@@ -46,34 +67,14 @@ describe('UploadCard', () => {
     expect(screen.getByText('Déposer un document')).toBeInTheDocument();
   });
 
-  it('should not show verify button when no file is selected', () => {
-    render(<UploadCard />);
-
-    expect(screen.queryByText('Vérifier le document')).not.toBeInTheDocument();
-  });
-
-  it('should show verify button when file is selected', async () => {
-    const user = userEvent.setup();
-    render(<UploadCard />);
-
-    const input = document.querySelector('input[type="file"]') as HTMLInputElement;
-    const file = createMockFile();
-
-    await user.upload(input, file);
-
-    await waitFor(() => {
-      expect(screen.getByText('Vérifier le document')).toBeInTheDocument();
-    });
-  });
-
-  it('should show loading state when uploading', async () => {
+  it('should show uploading state when file is selected', async () => {
+    const deferred = createDeferredPromise<{ success: boolean; data?: unknown }>();
     const { container } = await import('@infrastructure/di');
-    const mockExecute = vi.fn().mockImplementation(
-      () => new Promise((resolve) => setTimeout(() => resolve({ success: true, data: {} }), 1000))
-    );
-    vi.mocked(container.verifyDocument).mockReturnValue({ execute: mockExecute });
+    vi.mocked(container.verifyDocument).mockReturnValue({
+      execute: vi.fn().mockReturnValue(deferred.promise),
+    });
 
-    const user = userEvent.setup();
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
     render(<UploadCard />);
 
     const input = document.querySelector('input[type="file"]') as HTMLInputElement;
@@ -81,15 +82,31 @@ describe('UploadCard', () => {
 
     await user.upload(input, file);
 
-    await waitFor(() => {
-      expect(screen.getByText('Vérifier le document')).toBeInTheDocument();
+    expect(screen.getByText('Téléversement en cours…')).toBeInTheDocument();
+  });
+
+  it('should show processing state after uploading', async () => {
+    const deferred = createDeferredPromise<{ success: boolean; data?: unknown }>();
+    const { container } = await import('@infrastructure/di');
+    vi.mocked(container.verifyDocument).mockReturnValue({
+      execute: vi.fn().mockReturnValue(deferred.promise),
     });
 
-    await user.click(screen.getByText('Vérifier le document'));
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    render(<UploadCard />);
 
-    await waitFor(() => {
-      expect(screen.getByText('Analyse en cours...')).toBeInTheDocument();
+    const input = document.querySelector('input[type="file"]') as HTMLInputElement;
+    const file = createMockFile();
+
+    await user.upload(input, file);
+
+    expect(screen.getByText('Téléversement en cours…')).toBeInTheDocument();
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(500);
     });
+
+    expect(screen.getByText('Analyse du document…')).toBeInTheDocument();
   });
 
   it('should show error message and retry button on failure', async () => {
@@ -101,7 +118,7 @@ describe('UploadCard', () => {
       }),
     });
 
-    const user = userEvent.setup();
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
     render(<UploadCard />);
 
     const input = document.querySelector('input[type="file"]') as HTMLInputElement;
@@ -109,16 +126,12 @@ describe('UploadCard', () => {
 
     await user.upload(input, file);
 
-    await waitFor(() => {
-      expect(screen.getByText('Vérifier le document')).toBeInTheDocument();
+    await act(async () => {
+      await vi.runAllTimersAsync();
     });
 
-    await user.click(screen.getByText('Vérifier le document'));
-
-    await waitFor(() => {
-      expect(screen.getByRole('alert')).toHaveTextContent('Test error message');
-      expect(screen.getByText('Réessayer')).toBeInTheDocument();
-    });
+    expect(screen.getByRole('alert')).toHaveTextContent('Un problème est survenu');
+    expect(screen.getByText('Réessayer')).toBeInTheDocument();
   });
 
   it('should reset state when clicking retry', async () => {
@@ -130,7 +143,7 @@ describe('UploadCard', () => {
       }),
     });
 
-    const user = userEvent.setup();
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
     render(<UploadCard />);
 
     const input = document.querySelector('input[type="file"]') as HTMLInputElement;
@@ -138,21 +151,42 @@ describe('UploadCard', () => {
 
     await user.upload(input, file);
 
-    await waitFor(() => {
-      expect(screen.getByText('Vérifier le document')).toBeInTheDocument();
+    await act(async () => {
+      await vi.runAllTimersAsync();
     });
 
-    await user.click(screen.getByText('Vérifier le document'));
-
-    await waitFor(() => {
-      expect(screen.getByRole('alert')).toBeInTheDocument();
-    });
+    expect(screen.getByRole('alert')).toBeInTheDocument();
 
     await user.click(screen.getByText('Réessayer'));
 
-    await waitFor(() => {
-      expect(screen.queryByRole('alert')).not.toBeInTheDocument();
-      expect(screen.getByText('Déposer un document')).toBeInTheDocument();
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    expect(screen.getByText('Déposer un document')).toBeInTheDocument();
+  });
+
+  it('should navigate to result page on success', async () => {
+    const { container } = await import('@infrastructure/di');
+    vi.mocked(container.verifyDocument).mockReturnValue({
+      execute: vi.fn().mockResolvedValue({
+        success: true,
+        data: {
+          verificationId: 'test-verification-id',
+          verdict: 'valid',
+        },
+      }),
     });
+
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    render(<UploadCard />);
+
+    const input = document.querySelector('input[type="file"]') as HTMLInputElement;
+    const file = createMockFile();
+
+    await user.upload(input, file);
+
+    await act(async () => {
+      await vi.runAllTimersAsync();
+    });
+
+    expect(mockPush).toHaveBeenCalledWith('/resultat/test-verification-id');
   });
 });
