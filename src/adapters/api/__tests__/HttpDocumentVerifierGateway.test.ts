@@ -69,6 +69,52 @@ describe('HttpDocumentVerifierGateway', () => {
       );
     });
 
+    it('should send X-Client-Id header with correct value', async () => {
+      const mockResponse = {
+        ok: true,
+        status: 200,
+        json: vi.fn().mockResolvedValue(createMockApiResponse()),
+        headers: new Headers(),
+      };
+      vi.mocked(global.fetch).mockResolvedValue(mockResponse as unknown as Response);
+
+      const file = createMockFile();
+      const document = DocumentToVerify.create(file);
+
+      await gateway.verify(document);
+
+      const fetchCall = vi.mocked(global.fetch).mock.calls[0];
+      const requestOptions = fetchCall[1] as RequestInit;
+      const headers = requestOptions.headers as Record<string, string>;
+
+      expect(headers['X-Client-Id']).toBe('WEB-BIP-VIGIDOC');
+    });
+
+    it('should send X-Correlation-Id header with valid UUID', async () => {
+      const mockResponse = {
+        ok: true,
+        status: 200,
+        json: vi.fn().mockResolvedValue(createMockApiResponse()),
+        headers: new Headers(),
+      };
+      vi.mocked(global.fetch).mockResolvedValue(mockResponse as unknown as Response);
+
+      const file = createMockFile();
+      const document = DocumentToVerify.create(file);
+
+      await gateway.verify(document);
+
+      const fetchCall = vi.mocked(global.fetch).mock.calls[0];
+      const requestOptions = fetchCall[1] as RequestInit;
+      const headers = requestOptions.headers as Record<string, string>;
+
+      expect(headers['X-Correlation-Id']).toBeDefined();
+      // UUID v4 format: xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx
+      expect(headers['X-Correlation-Id']).toMatch(
+        /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+      );
+    });
+
     it('should return VerificationResult on success', async () => {
       const mockResponse = {
         ok: true,
