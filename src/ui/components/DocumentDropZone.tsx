@@ -116,7 +116,7 @@ export function DocumentDropZone({
         onDrop={handleDrop}
         className={`
           relative flex flex-col items-center justify-center
-          w-full min-h-[200px] px-6 py-8
+          w-full min-h-[100px] px-6 py-4
           border-2 border-dashed rounded-xl
           transition-all duration-200 ease-in-out
           motion-reduce:transition-none
@@ -142,7 +142,7 @@ export function DocumentDropZone({
 
         <div className="flex flex-col items-center text-center">
           <svg
-            className={`w-12 h-12 mb-4 motion-reduce:transition-none transition-colors ${
+            className={`w-8 h-8 mb-2 motion-reduce:transition-none transition-colors ${
               isDragOver ? 'text-primary-500' : 'text-gray-400'
             }`}
             fill="none"

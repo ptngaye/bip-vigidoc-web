@@ -70,7 +70,7 @@ export function UploadCard() {
         </div>
 
         {isProcessing ? (
-          <div className="flex flex-col items-center justify-center min-h-[200px] py-8">
+          <div className="flex flex-col items-center justify-center min-h-[100px] py-4">
             <Spinner />
             <p
               className="mt-4 text-sm font-medium text-gray-700"
