@@ -3,6 +3,8 @@ import type { DocumentToVerify, VerificationResult } from '@domain/entities';
 import { NetworkError, RateLimitExceededError, VerificationFailedError } from '@application/errors';
 import { VerificationResponseMapper, type ApiVerificationResponse } from './mappers/VerificationResponseMapper';
 
+const CLIENT_ID = 'WEB-BIP-VIGIDOC';
+
 const HTTP_STATUS = {
   OK: 200,
   BAD_REQUEST: 400,
@@ -24,6 +26,10 @@ export class HttpDocumentVerifierGateway implements DocumentVerifierGateway {
     try {
       response = await fetch(`${this.baseUrl}/v1/verify`, {
         method: 'POST',
+        headers: {
+          'X-Correlation-Id': crypto.randomUUID(),
+          'X-Client-Id': CLIENT_ID,
+        },
         body: formData,
       });
     } catch (error) {
