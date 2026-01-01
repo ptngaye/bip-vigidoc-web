@@ -61,6 +61,8 @@ export function useDocumentUpload(): UseDocumentUploadReturn {
         if (cancelled) return;
 
         if (result.success) {
+          console.log('Verification success:', result.data);
+          console.log('Verification ID:', result.data.verificationId);
           setState(prev => ({
             ...prev,
             status: 'success',

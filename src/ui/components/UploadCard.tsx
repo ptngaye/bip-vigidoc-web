@@ -32,6 +32,7 @@ export function UploadCard() {
 
   useEffect(() => {
     if (status === 'success' && result) {
+      console.log('Navigation to result page:', result.verificationId);
       router.push(`/resultat/${result.verificationId}`);
     }
   }, [status, result, router]);
