@@ -48,34 +48,45 @@ export function useDocumentUpload(): UseDocumentUploadReturn {
     let cancelled = false;
 
     const performVerification = async () => {
-      await new Promise(resolve => setTimeout(resolve, 500));
+      try {
+        await new Promise(resolve => setTimeout(resolve, 500));
 
-      if (cancelled) return;
+        if (cancelled) return;
 
-      setState(prev => ({ ...prev, status: 'processing' }));
+        setState(prev => ({ ...prev, status: 'processing' }));
 
-      const verifyDocument = container.verifyDocument();
-      const result = await verifyDocument.execute({ file: state.selectedFile! });
+        const verifyDocument = container.verifyDocument();
+        const result = await verifyDocument.execute({ file: state.selectedFile! });
 
-      if (cancelled) return;
+        if (cancelled) return;
 
-      if (result.success) {
-        setState(prev => ({
-          ...prev,
-          status: 'success',
-          result: result.data,
-          error: null,
-        }));
-      } else {
-        const errorMessage =
-          result.error instanceof DomainError
-            ? result.error.message
-            : 'Un problème est survenu. Réessayez dans quelques instants.';
+        if (result.success) {
+          setState(prev => ({
+            ...prev,
+            status: 'success',
+            result: result.data,
+            error: null,
+          }));
+        } else {
+          const errorMessage =
+            result.error instanceof DomainError
+              ? result.error.message
+              : 'Un problème est survenu. Réessayez dans quelques instants.';
 
+          setState(prev => ({
+            ...prev,
+            status: 'error',
+            error: errorMessage,
+          }));
+        }
+      } catch (error) {
+        if (cancelled) return;
+
+        console.error('Verification error:', error);
         setState(prev => ({
           ...prev,
           status: 'error',
-          error: errorMessage,
+          error: 'Une erreur inattendue est survenue. Veuillez réessayer.',
         }));
       }
     };
