@@ -67,7 +67,11 @@ export class HttpDocumentVerifierGateway implements DocumentVerifierGateway {
     }
 
     const data: ApiVerificationResponse = await response.json();
+    console.log('[Gateway] API response received:', data);
 
-    return VerificationResponseMapper.toDomain(data);
+    const result = VerificationResponseMapper.toDomain(data);
+    console.log('[Gateway] Mapped to domain:', result);
+
+    return result;
   }
 }
