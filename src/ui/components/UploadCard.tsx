@@ -1,10 +1,9 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
 import { DocumentDropZone } from './DocumentDropZone';
 import { FeatureBadges } from './FeatureBadges';
 import { useDocumentUpload } from '../hooks';
+import type { VerificationResult } from '@domain/entities';
 
 function Spinner() {
   return (
@@ -24,18 +23,153 @@ function Spinner() {
   );
 }
 
+function VerdictBadge({ verdict }: { verdict: string }) {
+  const config = {
+    valid: { bg: 'bg-green-100', text: 'text-green-800', label: 'Document valide' },
+    invalid: { bg: 'bg-red-100', text: 'text-red-800', label: 'Document invalide' },
+    indeterminate: { bg: 'bg-amber-100', text: 'text-amber-800', label: 'Vérification incomplète' },
+  }[verdict] || { bg: 'bg-gray-100', text: 'text-gray-800', label: verdict };
+
+  return (
+    <span
+      className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${config.bg} ${config.text}`}
+    >
+      {config.label}
+    </span>
+  );
+}
+
+function TrustBadge({ level }: { level: string }) {
+  const config = {
+    high: { bg: 'bg-green-50', text: 'text-green-700', label: 'Confiance élevée' },
+    medium: { bg: 'bg-amber-50', text: 'text-amber-700', label: 'Confiance moyenne' },
+    low: { bg: 'bg-red-50', text: 'text-red-700', label: 'Confiance faible' },
+  }[level] || { bg: 'bg-gray-50', text: 'text-gray-700', label: level };
+
+  return (
+    <span
+      className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${config.bg} ${config.text}`}
+    >
+      {config.label}
+    </span>
+  );
+}
+
+function ResultDisplay({ result, onReset }: { result: VerificationResult; onReset: () => void }) {
+  return (
+    <div className="space-y-6">
+      <div className="text-center">
+        <div className="mb-4">
+          {result.verdict === 'valid' ? (
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100">
+              <svg
+                className="w-8 h-8 text-green-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M5 13l4 4L19 7"
+                />
+              </svg>
+            </div>
+          ) : result.verdict === 'invalid' ? (
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-red-100">
+              <svg
+                className="w-8 h-8 text-red-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </div>
+          ) : (
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-amber-100">
+              <svg
+                className="w-8 h-8 text-amber-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                />
+              </svg>
+            </div>
+          )}
+        </div>
+        <VerdictBadge verdict={result.verdict} />
+        <div className="mt-2">
+          <TrustBadge level={result.trustLevel} />
+        </div>
+      </div>
+
+      <div className="bg-gray-50 rounded-lg p-4 space-y-3">
+        {result.documentTypeLabel && (
+          <div className="flex justify-between text-sm">
+            <span className="text-gray-500">Type de document</span>
+            <span className="font-medium text-gray-900">{result.documentTypeLabel}</span>
+          </div>
+        )}
+        {result.issuer && (
+          <div className="flex justify-between text-sm">
+            <span className="text-gray-500">Émetteur</span>
+            <span className="font-medium text-gray-900">{result.issuer}</span>
+          </div>
+        )}
+        {result.file && (
+          <div className="flex justify-between text-sm">
+            <span className="text-gray-500">Fichier</span>
+            <span className="font-medium text-gray-900">{result.file.filename}</span>
+          </div>
+        )}
+      </div>
+
+      {result.warnings.length > 0 && (
+        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+          <h4 className="text-sm font-medium text-amber-800 mb-2">Avertissements</h4>
+          <ul className="text-sm text-amber-700 space-y-1">
+            {result.warnings.map((warning, i) => (
+              <li key={i}>• {warning}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {result.failureReason && (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <h4 className="text-sm font-medium text-red-800 mb-2">Raison de l&apos;échec</h4>
+          <p className="text-sm text-red-700">{result.failureReason}</p>
+        </div>
+      )}
+
+      <button
+        type="button"
+        onClick={onReset}
+        className="w-full py-3 px-4 rounded-lg font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 transition-colors"
+      >
+        Vérifier un autre document
+      </button>
+    </div>
+  );
+}
+
 export function UploadCard() {
-  const router = useRouter();
   const { status, selectedFile, error, result, selectFile, reset } = useDocumentUpload();
 
   const isProcessing = status === 'uploading' || status === 'processing';
-
-  useEffect(() => {
-    if (status === 'success' && result) {
-      console.log('Navigation to result page:', result.verificationId);
-      router.push(`/resultat/${result.verificationId}`);
-    }
-  }, [status, result, router]);
 
   const getStatusMessage = (): string | null => {
     switch (status) {
@@ -49,6 +183,22 @@ export function UploadCard() {
   };
 
   const statusMessage = getStatusMessage();
+
+  // Show result if verification succeeded
+  if (status === 'success' && result) {
+    return (
+      <div className="w-full max-w-[640px] mx-auto">
+        <div className="bg-white rounded-2xl shadow-lg p-6 sm:p-8">
+          <div className="text-center mb-6">
+            <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-2">
+              Résultat de la vérification
+            </h2>
+          </div>
+          <ResultDisplay result={result} onReset={reset} />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full max-w-[640px] mx-auto">
