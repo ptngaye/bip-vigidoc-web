@@ -1,7 +1,10 @@
 import type { DocumentVerifierGateway } from '@application/ports';
 import type { DocumentToVerify, VerificationResult } from '@domain/entities';
 import { NetworkError, RateLimitExceededError, VerificationFailedError } from '@application/errors';
-import { VerificationResponseMapper, type ApiVerificationResponse } from './mappers/VerificationResponseMapper';
+import {
+  VerificationResponseMapper,
+  type ApiVerificationResponse,
+} from './mappers/VerificationResponseMapper';
 
 const CLIENT_ID = 'WEB-BIP-VIGIDOC';
 
@@ -40,9 +43,7 @@ export class HttpDocumentVerifierGateway implements DocumentVerifierGateway {
 
     if (response.status === HTTP_STATUS.TOO_MANY_REQUESTS) {
       const retryAfter = response.headers.get('X-RateLimit-Reset');
-      throw new RateLimitExceededError(
-        retryAfter ? parseInt(retryAfter, 10) : undefined
-      );
+      throw new RateLimitExceededError(retryAfter ? parseInt(retryAfter, 10) : undefined);
     }
 
     if (response.status === HTTP_STATUS.BAD_REQUEST) {

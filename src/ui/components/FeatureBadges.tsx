@@ -11,7 +11,7 @@ const FEATURES: Feature[] = [
 export function FeatureBadges() {
   return (
     <ul className="flex flex-wrap justify-center gap-3" aria-label="Avantages du service">
-      {FEATURES.map((feature) => (
+      {FEATURES.map(feature => (
         <li key={feature.label} className="flex items-center gap-1.5">
           <svg
             className="w-4 h-4 text-green-500 flex-shrink-0"

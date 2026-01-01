@@ -4,7 +4,8 @@ import userEvent from '@testing-library/user-event';
 import { DocumentDropZone } from '../DocumentDropZone';
 import { createMockFile } from '../../../test/createMockFile';
 
-const DROP_ZONE_LABEL = 'Zone de dépôt de document. Appuyez sur Entrée ou Espace pour choisir un fichier.';
+const DROP_ZONE_LABEL =
+  'Zone de dépôt de document. Appuyez sur Entrée ou Espace pour choisir un fichier.';
 
 describe('DocumentDropZone', () => {
   it('should render drop zone with correct text when no file selected', () => {
@@ -48,7 +49,9 @@ describe('DocumentDropZone', () => {
     fireEvent.drop(dropZone, { dataTransfer, preventDefault: vi.fn() });
 
     expect(onFileSelect).not.toHaveBeenCalled();
-    expect(screen.getByRole('alert')).toHaveTextContent('Format non pris en charge. Utilisez PDF, JPG ou PNG.');
+    expect(screen.getByRole('alert')).toHaveTextContent(
+      'Format non pris en charge. Utilisez PDF, JPG ou PNG.'
+    );
   });
 
   it('should show error for file too large via drop', () => {

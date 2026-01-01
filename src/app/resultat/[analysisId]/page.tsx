@@ -34,12 +34,8 @@ export default async function ResultPage({ params }: ResultPageProps) {
                 />
               </svg>
             </div>
-            <h1 className="text-2xl font-semibold text-gray-900 mb-2">
-              Résultat de vérification
-            </h1>
-            <p className="text-sm text-gray-500">
-              ID de vérification : {analysisId}
-            </p>
+            <h1 className="text-2xl font-semibold text-gray-900 mb-2">Résultat de vérification</h1>
+            <p className="text-sm text-gray-500">ID de vérification : {analysisId}</p>
           </div>
 
           <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6">
@@ -58,7 +54,8 @@ export default async function ResultPage({ params }: ResultPageProps) {
               </svg>
               <div>
                 <p className="text-sm text-amber-800">
-                  Cette page sera enrichie avec les détails de l&apos;analyse une fois la persistance des résultats implémentée.
+                  Cette page sera enrichie avec les détails de l&apos;analyse une fois la
+                  persistance des résultats implémentée.
                 </p>
               </div>
             </div>
@@ -67,9 +64,7 @@ export default async function ResultPage({ params }: ResultPageProps) {
           <div className="space-y-4">
             <details className="group">
               <summary className="flex items-center justify-between cursor-pointer p-4 bg-gray-50 rounded-lg hover:bg-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
-                <span className="font-medium text-gray-900">
-                  Contrôles effectués
-                </span>
+                <span className="font-medium text-gray-900">Contrôles effectués</span>
                 <svg
                   className="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform motion-reduce:transition-none"
                   fill="none"
@@ -92,9 +87,7 @@ export default async function ResultPage({ params }: ResultPageProps) {
 
             <details className="group">
               <summary className="flex items-center justify-between cursor-pointer p-4 bg-gray-50 rounded-lg hover:bg-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
-                <span className="font-medium text-gray-900">
-                  Recommandations
-                </span>
+                <span className="font-medium text-gray-900">Recommandations</span>
                 <svg
                   className="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform motion-reduce:transition-none"
                   fill="none"

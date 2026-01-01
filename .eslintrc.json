@@ -1,3 +1,56 @@
 {
-  "extends": "next/core-web-vitals"
+  "extends": ["next/core-web-vitals", "prettier"],
+  "plugins": ["boundaries", "prettier"],
+  "settings": {
+    "boundaries/elements": [
+      { "type": "domain", "pattern": "src/domain/*" },
+      { "type": "application", "pattern": "src/application/*" },
+      { "type": "adapters", "pattern": "src/adapters/*" },
+      { "type": "infrastructure", "pattern": "src/infrastructure/*" },
+      { "type": "ui", "pattern": "src/ui/*" },
+      { "type": "app", "pattern": "src/app/*" },
+      { "type": "test", "pattern": "src/test/*" }
+    ],
+    "boundaries/ignore": ["**/*.test.ts", "**/*.test.tsx"]
+  },
+  "rules": {
+    "prettier/prettier": "error",
+    "boundaries/element-types": [
+      "error",
+      {
+        "default": "disallow",
+        "rules": [
+          {
+            "from": "domain",
+            "allow": ["domain"]
+          },
+          {
+            "from": "application",
+            "allow": ["domain", "application"]
+          },
+          {
+            "from": "adapters",
+            "allow": ["domain", "application", "adapters"]
+          },
+          {
+            "from": "infrastructure",
+            "allow": ["domain", "application", "adapters", "infrastructure"]
+          },
+          {
+            "from": "ui",
+            "allow": ["domain", "application", "infrastructure", "ui"]
+          },
+          {
+            "from": "app",
+            "allow": ["ui", "infrastructure", "app"],
+            "message": "app/ (pages Next.js) ne peut importer que ui/ et infrastructure/. La logique métier doit passer par les composants/hooks UI."
+          },
+          {
+            "from": "test",
+            "allow": ["domain", "application", "adapters", "infrastructure", "ui", "app", "test"]
+          }
+        ]
+      }
+    ]
+  }
 }

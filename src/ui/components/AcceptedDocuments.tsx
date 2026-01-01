@@ -1,24 +1,16 @@
 import Link from 'next/link';
 
-const TIPS = [
-  'Document à plat',
-  'Bonne lumière',
-  'Bords visibles',
-  'Éviter reflets et ombres',
-];
+const TIPS = ['Document à plat', 'Bonne lumière', 'Bords visibles', 'Éviter reflets et ombres'];
 
 export function AcceptedDocuments() {
   return (
     <section aria-labelledby="photo-tips-title" className="text-center">
-      <h2
-        id="photo-tips-title"
-        className="text-sm font-medium text-gray-700 mb-3"
-      >
+      <h2 id="photo-tips-title" className="text-sm font-medium text-gray-700 mb-3">
         Conseils pour une bonne photo
       </h2>
 
       <ul className="inline-flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm text-gray-600">
-        {TIPS.map((tip) => (
+        {TIPS.map(tip => (
           <li key={tip} className="flex items-center gap-2">
             <svg
               className="w-4 h-4 text-green-500 flex-shrink-0"

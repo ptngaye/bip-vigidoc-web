@@ -6,7 +6,8 @@ export function Footer() {
       <div className="mx-auto max-w-[960px] px-6 sm:px-10 py-6">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-sm text-gray-500 text-center sm:text-left">
-            © 2025 BIP Tech — Bureau Informatique des PME, TPE et Indépendants. Tous droits réservés.
+            © 2025 BIP Tech — Bureau Informatique des PME, TPE et Indépendants. Tous droits
+            réservés.
           </p>
 
           <nav aria-label="Liens légaux">
@@ -20,7 +21,9 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <span className="text-gray-300" aria-hidden="true">|</span>
+                <span className="text-gray-300" aria-hidden="true">
+                  |
+                </span>
               </li>
               <li>
                 <Link

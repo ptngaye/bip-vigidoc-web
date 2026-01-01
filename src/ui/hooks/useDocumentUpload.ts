@@ -48,11 +48,11 @@ export function useDocumentUpload(): UseDocumentUploadReturn {
     let cancelled = false;
 
     const performVerification = async () => {
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      await new Promise(resolve => setTimeout(resolve, 500));
 
       if (cancelled) return;
 
-      setState((prev) => ({ ...prev, status: 'processing' }));
+      setState(prev => ({ ...prev, status: 'processing' }));
 
       const verifyDocument = container.verifyDocument();
       const result = await verifyDocument.execute({ file: state.selectedFile! });
@@ -60,7 +60,7 @@ export function useDocumentUpload(): UseDocumentUploadReturn {
       if (cancelled) return;
 
       if (result.success) {
-        setState((prev) => ({
+        setState(prev => ({
           ...prev,
           status: 'success',
           result: result.data,
@@ -72,7 +72,7 @@ export function useDocumentUpload(): UseDocumentUploadReturn {
             ? result.error.message
             : 'Un problème est survenu. Réessayez dans quelques instants.';
 
-        setState((prev) => ({
+        setState(prev => ({
           ...prev,
           status: 'error',
           error: errorMessage,

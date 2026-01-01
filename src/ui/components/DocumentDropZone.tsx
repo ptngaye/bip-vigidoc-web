@@ -24,9 +24,7 @@ export function DocumentDropZone({
       setValidationError(null);
 
       if (!ContentType.isSupported(file.type)) {
-        setValidationError(
-          'Format non pris en charge. Utilisez PDF, JPG ou PNG.'
-        );
+        setValidationError('Format non pris en charge. Utilisez PDF, JPG ou PNG.');
         return;
       }
 
@@ -50,13 +48,10 @@ export function DocumentDropZone({
     [isDisabled]
   );
 
-  const handleDragLeave = useCallback(
-    (event: React.DragEvent<HTMLDivElement>) => {
-      event.preventDefault();
-      setIsDragOver(false);
-    },
-    []
-  );
+  const handleDragLeave = useCallback((event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    setIsDragOver(false);
+  }, []);
 
   const handleDrop = useCallback(
     (event: React.DragEvent<HTMLDivElement>) => {
@@ -160,25 +155,17 @@ export function DocumentDropZone({
 
           {selectedFile ? (
             <div className="space-y-2">
-              <p className="text-sm font-medium text-gray-900">
-                {selectedFile.name}
-              </p>
+              <p className="text-sm font-medium text-gray-900">{selectedFile.name}</p>
               <p className="text-xs text-gray-500">
                 {(selectedFile.size / 1024 / 1024).toFixed(2)} Mo
               </p>
             </div>
           ) : isDragOver ? (
-            <p className="text-sm font-medium text-primary-600">
-              Relâchez pour déposer
-            </p>
+            <p className="text-sm font-medium text-primary-600">Relâchez pour déposer</p>
           ) : (
             <div className="space-y-2">
-              <p className="text-sm font-medium text-gray-700">
-                Déposer un document
-              </p>
-              <p className="text-xs text-gray-500">
-                PDF, JPG, PNG — max 10 Mo
-              </p>
+              <p className="text-sm font-medium text-gray-700">Déposer un document</p>
+              <p className="text-xs text-gray-500">PDF, JPG, PNG — max 10 Mo</p>
             </div>
           )}
         </div>
@@ -202,11 +189,7 @@ export function DocumentDropZone({
       )}
 
       {validationError && (
-        <p
-          id="dropzone-error"
-          className="mt-3 text-sm text-red-600 text-center"
-          role="alert"
-        >
+        <p id="dropzone-error" className="mt-3 text-sm text-red-600 text-center" role="alert">
           {validationError}
         </p>
       )}

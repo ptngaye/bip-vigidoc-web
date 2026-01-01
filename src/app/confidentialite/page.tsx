@@ -30,9 +30,7 @@ export default function ConfidentialitePage() {
 
         <section aria-labelledby="utilisation-title">
           <h2 id="utilisation-title">Utilisation des données</h2>
-          <p>
-            Les documents soumis sont utilisés exclusivement pour :
-          </p>
+          <p>Les documents soumis sont utilisés exclusivement pour :</p>
           <ul>
             <li>Effectuer l&apos;analyse d&apos;authenticité demandée</li>
             <li>Améliorer la qualité du service</li>
@@ -50,9 +48,7 @@ export default function ConfidentialitePage() {
 
         <section aria-labelledby="droits-title">
           <h2 id="droits-title">Vos droits</h2>
-          <p>
-            Conformément au RGPD, vous disposez des droits suivants :
-          </p>
+          <p>Conformément au RGPD, vous disposez des droits suivants :</p>
           <ul>
             <li>Droit d&apos;accès à vos données</li>
             <li>Droit de rectification</li>
@@ -65,20 +61,15 @@ export default function ConfidentialitePage() {
         <section aria-labelledby="contact-title">
           <h2 id="contact-title">Contact</h2>
           <p>
-            Pour toute question relative à la protection de vos données personnelles,
-            vous pouvez nous contacter.
+            Pour toute question relative à la protection de vos données personnelles, vous pouvez
+            nous contacter.
           </p>
         </section>
 
-        <p className="text-sm text-gray-500 mt-8">
-          Dernière mise à jour : janvier 2025
-        </p>
+        <p className="text-sm text-gray-500 mt-8">Dernière mise à jour : janvier 2025</p>
 
         <p className="mt-4">
-          <Link
-            href="/"
-            className="text-primary-600 hover:text-primary-700 underline"
-          >
+          <Link href="/" className="text-primary-600 hover:text-primary-700 underline">
             ← Retour à l&apos;accueil
           </Link>
         </p>

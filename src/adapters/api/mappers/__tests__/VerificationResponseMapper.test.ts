@@ -1,7 +1,12 @@
 import { describe, it, expect } from 'vitest';
-import { VerificationResponseMapper, type ApiVerificationResponse } from '../VerificationResponseMapper';
+import {
+  VerificationResponseMapper,
+  type ApiVerificationResponse,
+} from '../VerificationResponseMapper';
 
-function createMockApiResponse(overrides: Partial<ApiVerificationResponse> = {}): ApiVerificationResponse {
+function createMockApiResponse(
+  overrides: Partial<ApiVerificationResponse> = {}
+): ApiVerificationResponse {
   return {
     verification_id: 'test-uuid',
     verdict: 'valid',
@@ -100,7 +105,9 @@ describe('VerificationResponseMapper', () => {
 
     it('should map different detected types', () => {
       const kbisResponse = createMockApiResponse({ detected_type: 'kbis_infogreffe' });
-      expect(VerificationResponseMapper.toDomain(kbisResponse).detectedType).toBe('kbis_infogreffe');
+      expect(VerificationResponseMapper.toDomain(kbisResponse).detectedType).toBe(
+        'kbis_infogreffe'
+      );
 
       const urssafResponse = createMockApiResponse({ detected_type: 'urssaf_code' });
       expect(VerificationResponseMapper.toDomain(urssafResponse).detectedType).toBe('urssaf_code');

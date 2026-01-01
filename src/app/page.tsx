@@ -1,9 +1,4 @@
-import {
-  Hero,
-  UploadCard,
-  HowItWorks,
-  AcceptedDocuments,
-} from '@ui/components';
+import { Hero, UploadCard, HowItWorks, AcceptedDocuments } from '@ui/components';
 
 export default function HomePage() {
   return (

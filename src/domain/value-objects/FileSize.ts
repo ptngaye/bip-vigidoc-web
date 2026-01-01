@@ -10,7 +10,9 @@ export class FileSize {
       throw new FileTooLargeError('File size must be positive');
     }
     if (bytes > MAX_FILE_SIZE_BYTES) {
-      throw new FileTooLargeError(`File size exceeds maximum allowed (${MAX_FILE_SIZE_BYTES} bytes)`);
+      throw new FileTooLargeError(
+        `File size exceeds maximum allowed (${MAX_FILE_SIZE_BYTES} bytes)`
+      );
     }
     return new FileSize(bytes);
   }

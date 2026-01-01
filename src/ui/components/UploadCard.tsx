@@ -14,14 +14,7 @@ function Spinner() {
       viewBox="0 0 24 24"
       aria-hidden="true"
     >
-      <circle
-        className="opacity-25"
-        cx="12"
-        cy="12"
-        r="10"
-        stroke="currentColor"
-        strokeWidth="4"
-      />
+      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
       <path
         className="opacity-75"
         fill="currentColor"
@@ -33,8 +26,7 @@ function Spinner() {
 
 export function UploadCard() {
   const router = useRouter();
-  const { status, selectedFile, error, result, selectFile, reset } =
-    useDocumentUpload();
+  const { status, selectedFile, error, result, selectFile, reset } = useDocumentUpload();
 
   const isProcessing = status === 'uploading' || status === 'processing';
 
@@ -72,15 +64,10 @@ export function UploadCard() {
         {isProcessing ? (
           <div className="flex flex-col items-center justify-center min-h-[100px] py-4">
             <Spinner />
-            <p
-              className="mt-4 text-sm font-medium text-gray-700"
-              aria-live="polite"
-            >
+            <p className="mt-4 text-sm font-medium text-gray-700" aria-live="polite">
               {statusMessage}
             </p>
-            {selectedFile && (
-              <p className="mt-2 text-xs text-gray-500">{selectedFile.name}</p>
-            )}
+            {selectedFile && <p className="mt-2 text-xs text-gray-500">{selectedFile.name}</p>}
           </div>
         ) : (
           <div className="mb-6">
@@ -93,10 +80,7 @@ export function UploadCard() {
         )}
 
         {error && (
-          <div
-            className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg"
-            role="alert"
-          >
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg" role="alert">
             <div className="flex items-start gap-3">
               <svg
                 className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5"

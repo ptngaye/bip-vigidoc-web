@@ -8,11 +8,7 @@ export const metadata: Metadata = {
     "Vérifiez l'authenticité de vos documents administratifs français en quelques secondes.",
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="fr">
       <body className="min-h-screen flex flex-col bg-gray-50 antialiased">

@@ -28,7 +28,7 @@ vi.mock('@infrastructure/di', () => ({
 
 function createDeferredPromise<T>() {
   let resolve: (value: T) => void;
-  const promise = new Promise<T>((res) => {
+  const promise = new Promise<T>(res => {
     resolve = res;
   });
   return { promise, resolve: resolve! };
@@ -48,9 +48,7 @@ describe('UploadCard', () => {
     render(<UploadCard />);
 
     expect(screen.getByText('Vous avez déjà un document ?')).toBeInTheDocument();
-    expect(
-      screen.getByText('Déposez-le pour vérifier son authenticité.')
-    ).toBeInTheDocument();
+    expect(screen.getByText('Déposez-le pour vérifier son authenticité.')).toBeInTheDocument();
   });
 
   it('should render feature badges', () => {

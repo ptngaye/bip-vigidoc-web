@@ -15,23 +15,24 @@ export default function MentionsLegalesPage() {
         <section aria-labelledby="editeur-title">
           <h2 id="editeur-title">Éditeur du site</h2>
           <p>
-            <strong>BIP Tech</strong><br />
+            <strong>BIP Tech</strong>
+            <br />
             Bureau Informatique des PME, TPE et Indépendants
           </p>
         </section>
 
         <section aria-labelledby="directeur-title">
           <h2 id="directeur-title">Directeur de la publication</h2>
-          <p>
-            Le directeur de la publication est le représentant légal de BIP Tech.
-          </p>
+          <p>Le directeur de la publication est le représentant légal de BIP Tech.</p>
         </section>
 
         <section aria-labelledby="hebergement-title">
           <h2 id="hebergement-title">Hébergement</h2>
           <p>
-            Ce site est hébergé par Vercel Inc.<br />
-            340 S Lemon Ave #4133<br />
+            Ce site est hébergé par Vercel Inc.
+            <br />
+            340 S Lemon Ave #4133
+            <br />
             Walnut, CA 91789, USA
           </p>
         </section>
@@ -39,9 +40,9 @@ export default function MentionsLegalesPage() {
         <section aria-labelledby="propriete-title">
           <h2 id="propriete-title">Propriété intellectuelle</h2>
           <p>
-            L&apos;ensemble du contenu de ce site (textes, images, logos, structure)
-            est la propriété exclusive de BIP Tech, sauf mention contraire.
-            Toute reproduction, même partielle, est interdite sans autorisation préalable.
+            L&apos;ensemble du contenu de ce site (textes, images, logos, structure) est la
+            propriété exclusive de BIP Tech, sauf mention contraire. Toute reproduction, même
+            partielle, est interdite sans autorisation préalable.
           </p>
         </section>
 
@@ -57,21 +58,15 @@ export default function MentionsLegalesPage() {
         <section aria-labelledby="donnees-title">
           <h2 id="donnees-title">Protection des données personnelles</h2>
           <p>
-            Pour toute information concernant le traitement de vos données personnelles,
-            veuillez consulter notre{' '}
-            <Link href="/confidentialite">politique de confidentialité</Link>.
+            Pour toute information concernant le traitement de vos données personnelles, veuillez
+            consulter notre <Link href="/confidentialite">politique de confidentialité</Link>.
           </p>
         </section>
 
-        <p className="text-sm text-gray-500 mt-8">
-          Dernière mise à jour : janvier 2025
-        </p>
+        <p className="text-sm text-gray-500 mt-8">Dernière mise à jour : janvier 2025</p>
 
         <p className="mt-4">
-          <Link
-            href="/"
-            className="text-primary-600 hover:text-primary-700 underline"
-          >
+          <Link href="/" className="text-primary-600 hover:text-primary-700 underline">
             ← Retour à l&apos;accueil
           </Link>
         </p>
