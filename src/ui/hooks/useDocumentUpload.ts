@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import type { VerificationResult } from '@domain/entities';
 import { DomainError } from '@domain/errors';
 import { container } from '@infrastructure/di';
@@ -40,64 +40,65 @@ export function useDocumentUpload(): UseDocumentUploadReturn {
     });
   }, []);
 
+  const verificationIdRef = useRef(0);
+
   useEffect(() => {
     if (state.status !== 'uploading' || !state.selectedFile) {
       return;
     }
 
-    let cancelled = false;
+    const fileToVerify = state.selectedFile;
+    const currentVerificationId = ++verificationIdRef.current;
 
     const performVerification = async () => {
       try {
         await new Promise(resolve => setTimeout(resolve, 500));
 
-        if (cancelled) return;
+        if (verificationIdRef.current !== currentVerificationId) return;
 
         setState(prev => ({ ...prev, status: 'processing' }));
 
         const verifyDocument = container.verifyDocument();
-        const result = await verifyDocument.execute({ file: state.selectedFile! });
+        const result = await verifyDocument.execute({ file: fileToVerify });
 
-        if (cancelled) return;
+        if (verificationIdRef.current !== currentVerificationId) return;
 
         if (result.success) {
           console.log('Verification success:', result.data);
           console.log('Verification ID:', result.data.verificationId);
-          setState(prev => ({
-            ...prev,
+          setState({
             status: 'success',
             result: result.data,
             error: null,
-          }));
+            selectedFile: fileToVerify,
+          });
         } else {
           const errorMessage =
             result.error instanceof DomainError
               ? result.error.message
               : 'Un problème est survenu. Réessayez dans quelques instants.';
 
-          setState(prev => ({
-            ...prev,
+          setState({
             status: 'error',
+            result: null,
             error: errorMessage,
-          }));
+            selectedFile: fileToVerify,
+          });
         }
       } catch (error) {
-        if (cancelled) return;
+        if (verificationIdRef.current !== currentVerificationId) return;
 
         console.error('Verification error:', error);
-        setState(prev => ({
-          ...prev,
+        setState({
           status: 'error',
+          result: null,
           error: 'Une erreur inattendue est survenue. Veuillez réessayer.',
-        }));
+          selectedFile: fileToVerify,
+        });
       }
     };
 
     performVerification();
-
-    return () => {
-      cancelled = true;
-    };
   }, [state.status, state.selectedFile]);
 
   const reset = useCallback(() => {
