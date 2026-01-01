@@ -129,6 +129,12 @@ function ResultDisplay({ result, onReset }: { result: VerificationResult; onRese
             <span className="font-medium text-gray-900">{result.issuer}</span>
           </div>
         )}
+        {result.documentFamily && (
+          <div className="flex justify-between text-sm">
+            <span className="text-gray-500">Famille</span>
+            <span className="font-medium text-gray-900">{result.documentFamily}</span>
+          </div>
+        )}
         {result.file && (
           <div className="flex justify-between text-sm">
             <span className="text-gray-500">Fichier</span>
@@ -136,6 +142,22 @@ function ResultDisplay({ result, onReset }: { result: VerificationResult; onRese
           </div>
         )}
       </div>
+
+      {Object.keys(result.extractedFields).length > 0 && (
+        <div className="bg-blue-50 rounded-lg p-4">
+          <h4 className="text-sm font-medium text-blue-800 mb-3">Données extraites</h4>
+          <div className="space-y-2">
+            {Object.entries(result.extractedFields).map(([key, value]) => (
+              <div key={key} className="flex justify-between text-sm">
+                <span className="text-blue-600">{key.replace(/_/g, ' ')}</span>
+                <span className="font-medium text-blue-900 text-right max-w-[60%] break-all">
+                  {value}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {result.warnings.length > 0 && (
         <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
