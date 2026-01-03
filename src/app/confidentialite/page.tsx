@@ -3,7 +3,8 @@ import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Politique de confidentialité - Site web BIP VigiDoc',
-  description: 'Politique de confidentialité du site web BIP VigiDoc. Cette politique ne s\'applique pas à l\'extension navigateur.',
+  description:
+    "Politique de confidentialité du site web BIP VigiDoc. Cette politique ne s'applique pas à l'extension navigateur.",
 };
 
 export default function ConfidentialitePage() {
@@ -13,8 +14,12 @@ export default function ConfidentialitePage() {
         <h1>Politique de confidentialité — Site web BIP VigiDoc</h1>
 
         <p className="text-sm text-gray-500">Dernière mise à jour : 3 janvier 2026</p>
-        <p><strong>Éditeur :</strong> BIP Tech</p>
-        <p><strong>Service concerné :</strong> Site web https://vigidoc.bip-tech.fr</p>
+        <p>
+          <strong>Éditeur :</strong> BIP Tech
+        </p>
+        <p>
+          <strong>Service concerné :</strong> Site web https://vigidoc.bip-tech.fr
+        </p>
 
         <div className="bg-amber-50 border-l-4 border-amber-400 p-4 my-6">
           <p className="text-amber-800 font-medium m-0">
@@ -27,14 +32,16 @@ export default function ConfidentialitePage() {
         <section aria-labelledby="objet-title">
           <h2 id="objet-title">1. Objet de la présente politique</h2>
           <p>
-            La présente politique de confidentialité décrit la manière dont BIP Tech traite les données
-            personnelles dans le cadre de l&apos;utilisation du site web BIP VigiDoc, accessible à l&apos;adresse
-            https://vigidoc.bip-tech.fr.
+            La présente politique de confidentialité décrit la manière dont BIP Tech traite les
+            données personnelles dans le cadre de l&apos;utilisation du site web BIP VigiDoc,
+            accessible à l&apos;adresse https://vigidoc.bip-tech.fr.
           </p>
           <p>Elle a pour objectif de garantir :</p>
           <ul>
             <li>la transparence du traitement des données,</li>
-            <li>la conformité au Règlement Général sur la Protection des Données (UE) 2016/679 (RGPD),</li>
+            <li>
+              la conformité au Règlement Général sur la Protection des Données (UE) 2016/679 (RGPD),
+            </li>
             <li>la compréhension claire des responsabilités de BIP Tech.</li>
           </ul>
         </section>
@@ -42,11 +49,19 @@ export default function ConfidentialitePage() {
         <hr className="my-8" />
 
         <section aria-labelledby="perimetre-title">
-          <h2 id="perimetre-title">2. Périmètre strict — exclusion de l&apos;extension navigateur</h2>
-          <p><strong>Cette politique ne concerne que le site web.</strong></p>
+          <h2 id="perimetre-title">
+            2. Périmètre strict — exclusion de l&apos;extension navigateur
+          </h2>
           <p>
-            👉 L&apos;extension navigateur BIP VigiDoc fait l&apos;objet d&apos;une politique distincte, accessible à l&apos;adresse :<br />
-            <Link href="/confidentialite-extension" className="text-primary-600 hover:text-primary-700 underline">
+            <strong>Cette politique ne concerne que le site web.</strong>
+          </p>
+          <p>
+            👉 L&apos;extension navigateur BIP VigiDoc fait l&apos;objet d&apos;une politique
+            distincte, accessible à l&apos;adresse :<br />
+            <Link
+              href="/confidentialite-extension"
+              className="text-primary-600 hover:text-primary-700 underline"
+            >
               https://vigidoc.bip-tech.fr/confidentialite-extension
             </Link>
           </p>
@@ -54,7 +69,10 @@ export default function ConfidentialitePage() {
           <ul>
             <li>l&apos;extension ne transmet aucun document aux serveurs de BIP Tech,</li>
             <li>l&apos;extension fonctionne exclusivement en local,</li>
-            <li>les seuls appels réseau effectués par l&apos;extension visent des autorités de certification publiques agréées par l&apos;ANTS.</li>
+            <li>
+              les seuls appels réseau effectués par l&apos;extension visent des autorités de
+              certification publiques agréées par l&apos;ANTS.
+            </li>
           </ul>
         </section>
 
@@ -63,13 +81,15 @@ export default function ConfidentialitePage() {
         <section aria-labelledby="responsable-title">
           <h2 id="responsable-title">3. Responsable du traitement</h2>
           <p>
-            <strong>Responsable du traitement :</strong><br />
-            BIP Tech<br />
+            <strong>Responsable du traitement :</strong>
+            <br />
+            BIP Tech
+            <br />
             Contact : contact@bip-tech.fr
           </p>
           <p>
-            BIP Tech agit en qualité de responsable de traitement au sens de l&apos;article 4 du RGPD
-            pour les traitements décrits ci-dessous.
+            BIP Tech agit en qualité de responsable de traitement au sens de l&apos;article 4 du
+            RGPD pour les traitements décrits ci-dessous.
           </p>
         </section>
 
@@ -77,7 +97,10 @@ export default function ConfidentialitePage() {
 
         <section aria-labelledby="donnees-title">
           <h2 id="donnees-title">4. Données personnelles traitées</h2>
-          <p>Dans le cadre de l&apos;utilisation du site web, les données suivantes peuvent être traitées :</p>
+          <p>
+            Dans le cadre de l&apos;utilisation du site web, les données suivantes peuvent être
+            traitées :
+          </p>
 
           <h3>4.1 Données fournies par l&apos;utilisateur</h3>
           <ul>
@@ -102,19 +125,29 @@ export default function ConfidentialitePage() {
           <p>Les données sont traitées exclusivement pour les finalités suivantes :</p>
           <ol>
             <li>
-              <strong>Exécuter l&apos;analyse technique demandée par l&apos;utilisateur</strong><br />
-              (vérification de structure, de cohérence et d&apos;authenticité technique des documents)
+              <strong>Exécuter l&apos;analyse technique demandée par l&apos;utilisateur</strong>
+              <br />
+              (vérification de structure, de cohérence et d&apos;authenticité technique des
+              documents)
             </li>
             <li>
-              <strong>Assurer la sécurité du service</strong><br />
-              (prévention des abus, détection d&apos;activités frauduleuses, protection de l&apos;infrastructure)
+              <strong>Assurer la sécurité du service</strong>
+              <br />
+              (prévention des abus, détection d&apos;activités frauduleuses, protection de
+              l&apos;infrastructure)
             </li>
             <li>
-              <strong>Amélioration continue du service</strong><br />
+              <strong>Amélioration continue du service</strong>
+              <br />
               (analyse statistique agrégée et anonymisée uniquement)
             </li>
           </ol>
-          <p>👉 <strong>Aucune donnée n&apos;est utilisée à des fins publicitaires ou de profilage.</strong></p>
+          <p>
+            👉{' '}
+            <strong>
+              Aucune donnée n&apos;est utilisée à des fins publicitaires ou de profilage.
+            </strong>
+          </p>
         </section>
 
         <hr className="my-8" />
@@ -123,8 +156,13 @@ export default function ConfidentialitePage() {
           <h2 id="base-legale-title">6. Base légale du traitement</h2>
           <p>Les traitements reposent sur :</p>
           <ul>
-            <li>L&apos;exécution d&apos;un service à la demande de l&apos;utilisateur (article 6.1.b RGPD)</li>
-            <li>L&apos;intérêt légitime de BIP Tech à sécuriser son service (article 6.1.f RGPD)</li>
+            <li>
+              L&apos;exécution d&apos;un service à la demande de l&apos;utilisateur (article 6.1.b
+              RGPD)
+            </li>
+            <li>
+              L&apos;intérêt légitime de BIP Tech à sécuriser son service (article 6.1.f RGPD)
+            </li>
           </ul>
         </section>
 
@@ -159,7 +197,9 @@ export default function ConfidentialitePage() {
             <li>à aucun tiers commercial,</li>
             <li>à aucun partenaire marketing.</li>
           </ul>
-          <p><strong>Aucune donnée personnelle n&apos;est vendue, louée ou cédée.</strong></p>
+          <p>
+            <strong>Aucune donnée personnelle n&apos;est vendue, louée ou cédée.</strong>
+          </p>
         </section>
 
         <hr className="my-8" />
@@ -172,8 +212,8 @@ export default function ConfidentialitePage() {
             <li>ou dans des pays reconnus comme offrant un niveau de protection adéquat.</li>
           </ul>
           <p>
-            En cas de transfert exceptionnel hors UE, BIP Tech s&apos;engage à utiliser des garanties
-            appropriées conformément au RGPD.
+            En cas de transfert exceptionnel hors UE, BIP Tech s&apos;engage à utiliser des
+            garanties appropriées conformément au RGPD.
           </p>
         </section>
 
@@ -182,9 +222,16 @@ export default function ConfidentialitePage() {
         <section aria-labelledby="conservation-title">
           <h2 id="conservation-title">10. Durée de conservation</h2>
           <ul>
-            <li><strong>Documents soumis :</strong> non conservés après l&apos;analyse</li>
-            <li><strong>Logs techniques :</strong> durée limitée, proportionnée et conforme aux obligations légales et de sécurité</li>
-            <li><strong>Données agrégées :</strong> anonymisées irréversiblement</li>
+            <li>
+              <strong>Documents soumis :</strong> non conservés après l&apos;analyse
+            </li>
+            <li>
+              <strong>Logs techniques :</strong> durée limitée, proportionnée et conforme aux
+              obligations légales et de sécurité
+            </li>
+            <li>
+              <strong>Données agrégées :</strong> anonymisées irréversiblement
+            </li>
           </ul>
         </section>
 
@@ -203,7 +250,10 @@ export default function ConfidentialitePage() {
           </ul>
           <p>
             Vous pouvez exercer vos droits en contactant :<br />
-            <a href="mailto:contact@bip-tech.fr" className="text-primary-600 hover:text-primary-700 underline">
+            <a
+              href="mailto:contact@bip-tech.fr"
+              className="text-primary-600 hover:text-primary-700 underline"
+            >
               contact@bip-tech.fr
             </a>
           </p>
@@ -234,9 +284,7 @@ export default function ConfidentialitePage() {
             BIP Tech se réserve le droit de modifier la présente politique afin de l&apos;adapter à
             l&apos;évolution du service ou du cadre légal.
           </p>
-          <p>
-            La version applicable est celle publiée sur le site à la date de consultation.
-          </p>
+          <p>La version applicable est celle publiée sur le site à la date de consultation.</p>
         </section>
 
         <p className="mt-8">
