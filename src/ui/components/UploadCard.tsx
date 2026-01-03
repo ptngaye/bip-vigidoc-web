@@ -52,45 +52,80 @@ function getFieldLabel(key: string): string {
   return FIELD_LABELS[key] || key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
 }
 
-function getVerdictInfo(verdict: string) {
-  switch (verdict) {
-    case 'valid':
+type TrustLevelStyle = 'high' | 'medium' | 'invalid' | 'low';
+
+function getTrustLevelStyle(trustLevel: string, verdict: string): TrustLevelStyle {
+  if (verdict === 'invalid') return 'invalid';
+  if (trustLevel === 'high' && verdict === 'valid') return 'high';
+  if (trustLevel === 'medium') return 'medium';
+  return 'low';
+}
+
+function getTrustLevelInfo(trustLevel: string, verdict: string) {
+  const style = getTrustLevelStyle(trustLevel, verdict);
+
+  switch (style) {
+    case 'high':
       return {
-        title: 'Document authentique',
-        subtitle: 'Signature cryptographique valide',
-        bgColor: 'bg-green-100',
-        iconColor: 'text-green-600',
+        style: 'high' as const,
+        title: 'Signature cryptographique vérifiée',
+        subtitle:
+          'Signature ECDSA validée à partir des certificats publics officiels (ANTS – 2D-Doc)',
+        borderColor: 'border-green-700',
+        textColor: 'text-green-700',
+        iconBgColor: 'bg-green-50',
         icon: (
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
         ),
       };
     case 'invalid':
       return {
-        title: 'Document non authentique',
-        subtitle: 'Signature invalide',
-        bgColor: 'bg-red-100',
-        iconColor: 'text-red-600',
-        icon: (
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M6 18L18 6M6 6l12 12"
-          />
-        ),
-      };
-    default:
-      return {
-        title: 'Authenticité non déterminable',
-        subtitle: 'Signature non vérifiable',
-        bgColor: 'bg-amber-100',
-        iconColor: 'text-amber-600',
+        style: 'invalid' as const,
+        title: 'Signature cryptographique invalide',
+        subtitle: 'La signature ne correspond pas aux certificats de confiance connus',
+        borderColor: 'border-red-800',
+        textColor: 'text-red-800',
+        iconBgColor: 'bg-red-50',
         icon: (
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
             strokeWidth={2}
             d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+          />
+        ),
+      };
+    case 'medium':
+      return {
+        style: 'medium' as const,
+        title: 'Format 2D-Doc détecté',
+        subtitle: 'Structure du document reconnue comme compatible avec le standard 2D-Doc (ANTS).',
+        borderColor: 'border-slate-500',
+        textColor: 'text-slate-600',
+        iconBgColor: 'bg-slate-50',
+        icon: (
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+          />
+        ),
+      };
+    default:
+      return {
+        style: 'low' as const,
+        title: 'Format non reconnu',
+        subtitle: "Ce document n'a pas pu être identifié.",
+        borderColor: 'border-gray-400',
+        textColor: 'text-gray-500',
+        iconBgColor: 'bg-gray-50',
+        icon: (
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
           />
         ),
       };
@@ -129,30 +164,75 @@ function CollapsibleSection({
 }
 
 function ResultDisplay({ result, onReset }: { result: VerificationResult; onReset: () => void }) {
-  const verdictInfo = getVerdictInfo(result.verdict);
+  const levelInfo = getTrustLevelInfo(result.trustLevel, result.verdict);
   const hasExtractedFields = Object.keys(result.extractedFields).length > 0;
 
   return (
     <div className="space-y-4">
-      {/* Verdict principal */}
-      <div className="text-center">
+      {/* Verdict principal - bordure colorée + fond blanc */}
+      <div className={`text-center p-6 rounded-xl border-2 bg-white ${levelInfo.borderColor}`}>
         <div className="mb-4">
           <div
-            className={`inline-flex items-center justify-center w-16 h-16 rounded-full ${verdictInfo.bgColor}`}
+            className={`inline-flex items-center justify-center w-16 h-16 rounded-full ${levelInfo.iconBgColor}`}
           >
             <svg
-              className={`w-8 h-8 ${verdictInfo.iconColor}`}
+              className={`w-8 h-8 ${levelInfo.textColor}`}
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
             >
-              {verdictInfo.icon}
+              {levelInfo.icon}
             </svg>
           </div>
         </div>
-        <h3 className="text-xl font-semibold text-gray-900 mb-1">{verdictInfo.title}</h3>
-        <p className="text-sm text-gray-500">{verdictInfo.subtitle}</p>
+        <h3 className={`text-xl font-semibold mb-1 ${levelInfo.textColor}`}>{levelInfo.title}</h3>
+        <p className="text-sm text-gray-500">{levelInfo.subtitle}</p>
       </div>
+
+      {/* Bloc crypto - uniquement pour HIGH */}
+      {levelInfo.style === 'high' && (
+        <div className="border border-green-200 rounded-lg p-4 bg-green-50/50">
+          <h4 className="text-xs font-semibold text-green-800 uppercase tracking-wide mb-3">
+            Informations cryptographiques
+          </h4>
+          <div className="space-y-2 text-sm">
+            <div className="flex justify-between">
+              <span className="text-green-700">Algorithme</span>
+              <span className="font-medium text-green-900">ECDSA P-256</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-green-700">Source</span>
+              <span className="font-medium text-green-900">ANTS (2D-Doc)</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-green-700">Consulté le</span>
+              <span className="font-medium text-green-900">
+                {new Date(result.verifiedAt).toLocaleDateString('fr-FR')}{' '}
+                {new Date(result.verifiedAt).toLocaleTimeString('fr-FR', {
+                  hour: '2-digit',
+                  minute: '2-digit',
+                })}
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Limites - pour MEDIUM */}
+      {levelInfo.style === 'medium' && (
+        <div className="border border-slate-200 rounded-lg p-4 bg-slate-50/50">
+          <h4 className="text-xs font-semibold text-slate-700 uppercase tracking-wide mb-3">
+            Limites
+          </h4>
+          <p className="text-sm text-slate-600 leading-relaxed">
+            <strong className="block mb-1">
+              Aucune signature cryptographique vérifiable n&apos;a été détectée à ce stade.
+            </strong>
+            La structure du document est compatible avec le standard 2D-Doc, mais son intégrité
+            cryptographique n&apos;a pas pu être confirmée à partir des certificats disponibles.
+          </p>
+        </div>
+      )}
 
       {/* Infos principales */}
       <div className="bg-gray-50 rounded-lg p-4 space-y-3">
@@ -194,10 +274,10 @@ function ResultDisplay({ result, onReset }: { result: VerificationResult; onRese
         </div>
       )}
 
-      {/* Données extraites (repliable) */}
+      {/* Informations extraites (repliable) */}
       {hasExtractedFields && (
         <CollapsibleSection
-          title="Données extraites"
+          title="Informations extraites"
           bgColor="bg-blue-50"
           textColor="text-blue-800"
         >
@@ -215,9 +295,9 @@ function ResultDisplay({ result, onReset }: { result: VerificationResult; onRese
         </CollapsibleSection>
       )}
 
-      {/* Détails techniques (repliable) */}
+      {/* Métadonnées techniques (repliable) */}
       <CollapsibleSection
-        title="Détails techniques"
+        title="Métadonnées techniques"
         bgColor="bg-gray-100"
         textColor="text-gray-700"
       >
@@ -249,9 +329,13 @@ function ResultDisplay({ result, onReset }: { result: VerificationResult; onRese
             </div>
           )}
           <div className="flex justify-between">
-            <span className="text-gray-500">Vérifié à</span>
+            <span className="text-gray-500">Consulté le</span>
             <span className="font-medium text-gray-900">
-              {new Date(result.verifiedAt).toLocaleString('fr-FR')}
+              {new Date(result.verifiedAt).toLocaleDateString('fr-FR')}{' '}
+              {new Date(result.verifiedAt).toLocaleTimeString('fr-FR', {
+                hour: '2-digit',
+                minute: '2-digit',
+              })}
             </span>
           </div>
           {result.file && (
