@@ -168,18 +168,10 @@ function ResultDisplay({ result, onReset }: { result: VerificationResult; onRese
   const levelInfo = getTrustLevelInfo(result.trustLevel, result.verdict);
   const hasExtractedFields = Object.keys(result.extractedFields).length > 0;
 
-  // Background adapté selon le niveau
-  const getVerdictBackground = () => {
-    if (levelInfo.style === 'medium') return 'bg-gray-50'; // Fond neutre pour MEDIUM
-    return 'bg-white';
-  };
-
   return (
     <div className="space-y-4">
-      {/* Verdict principal */}
-      <div
-        className={`text-center p-6 rounded-xl border-2 ${getVerdictBackground()} ${levelInfo.borderColor}`}
-      >
+      {/* Verdict principal - fond blanc */}
+      <div className={`text-center p-6 rounded-xl border ${levelInfo.borderColor} bg-white`}>
         <div className="mb-4">
           <div
             className={`inline-flex items-center justify-center w-16 h-16 rounded-full ${levelInfo.iconBgColor}`}
@@ -207,7 +199,7 @@ function ResultDisplay({ result, onReset }: { result: VerificationResult; onRese
 
       {/* Bloc crypto - uniquement pour HIGH */}
       {levelInfo.style === 'high' && (
-        <div className="border border-green-200 rounded-lg p-4 bg-green-50/50">
+        <div className="border border-gray-200 rounded-lg p-4 bg-white">
           <h4 className="text-xs font-semibold text-green-800 uppercase tracking-wide mb-3">
             Informations cryptographiques
           </h4>
@@ -236,7 +228,7 @@ function ResultDisplay({ result, onReset }: { result: VerificationResult; onRese
 
       {/* Limites et points d'attention - pour MEDIUM */}
       {levelInfo.style === 'medium' && (
-        <div className="border border-amber-200 rounded-lg p-4 bg-amber-50/50">
+        <div className="border border-gray-200 rounded-lg p-4 bg-white">
           <h4 className="text-xs font-semibold text-amber-700 uppercase tracking-wide mb-3">
             Limites et points d&apos;attention
           </h4>
@@ -251,7 +243,7 @@ function ResultDisplay({ result, onReset }: { result: VerificationResult; onRese
       )}
 
       {/* Infos principales */}
-      <div className="bg-gray-50 rounded-lg p-4 space-y-3">
+      <div className="border border-gray-200 rounded-lg p-4 space-y-3 bg-white">
         <div className="flex justify-between text-sm">
           <span className="text-gray-500">Type de document</span>
           <span className="font-medium text-gray-900">
@@ -294,18 +286,18 @@ function ResultDisplay({ result, onReset }: { result: VerificationResult; onRese
       {hasExtractedFields && (
         <CollapsibleSection
           title="Informations extraites"
-          bgColor="bg-blue-50"
-          textColor="text-blue-800"
+          bgColor="bg-white border border-gray-200"
+          textColor="text-gray-700"
         >
           <div className="space-y-2">
             {Object.entries(result.extractedFields).map(([key, value]) => (
               <div key={key} className="flex justify-between text-sm gap-4">
-                <span className="text-blue-600">{getFieldLabel(key)}</span>
-                <span className="font-medium text-blue-900 text-right break-all">{value}</span>
+                <span className="text-gray-500">{getFieldLabel(key)}</span>
+                <span className="font-medium text-gray-900 text-right break-all">{value}</span>
               </div>
             ))}
           </div>
-          <p className="text-xs text-blue-500 mt-3 pt-3 border-t border-blue-200">
+          <p className="text-xs text-gray-400 mt-3 pt-3 border-t border-gray-200">
             Informations extraites automatiquement, à titre informatif.
           </p>
         </CollapsibleSection>
@@ -314,7 +306,7 @@ function ResultDisplay({ result, onReset }: { result: VerificationResult; onRese
       {/* Métadonnées techniques (repliable) - ordre strict aligné extension */}
       <CollapsibleSection
         title="Métadonnées techniques"
-        bgColor="bg-gray-100"
+        bgColor="bg-white border border-gray-200"
         textColor="text-gray-700"
       >
         <div className="space-y-2 text-sm">
