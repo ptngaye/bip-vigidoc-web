@@ -64,8 +64,6 @@ export function useDocumentUpload(): UseDocumentUploadReturn {
         if (verificationIdRef.current !== currentVerificationId) return;
 
         if (result.success) {
-          console.log('Verification success:', result.data);
-          console.log('Verification ID:', result.data.verificationId);
           setState({
             status: 'success',
             result: result.data,
@@ -85,10 +83,9 @@ export function useDocumentUpload(): UseDocumentUploadReturn {
             selectedFile: fileToVerify,
           });
         }
-      } catch (error) {
+      } catch {
         if (verificationIdRef.current !== currentVerificationId) return;
 
-        console.error('Verification error:', error);
         setState({
           status: 'error',
           result: null,

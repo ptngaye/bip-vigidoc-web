@@ -5,8 +5,10 @@ import {
   VerificationResponseMapper,
   type ApiVerificationResponse,
 } from './mappers/VerificationResponseMapper';
+import { getSessionId, setSessionId } from '../session';
 
 const CLIENT_ID = 'WEB-BIP-VIGIDOC';
+const SESSION_ID_HEADER = 'X-Session-Id';
 
 const HTTP_STATUS = {
   OK: 200,
@@ -27,11 +29,13 @@ export class HttpDocumentVerifierGateway implements DocumentVerifierGateway {
     let response: Response;
 
     try {
+      const sessionId = getSessionId();
       response = await fetch(`${this.baseUrl}/v1/verify`, {
         method: 'POST',
         headers: {
           'X-Correlation-Id': crypto.randomUUID(),
           'X-Client-Id': CLIENT_ID,
+          ...(sessionId && { [SESSION_ID_HEADER]: sessionId }),
         },
         body: formData,
       });
@@ -66,12 +70,13 @@ export class HttpDocumentVerifierGateway implements DocumentVerifierGateway {
       throw new NetworkError(`Unexpected response status: ${response.status}`, response.status);
     }
 
+    // Store session ID from response if backend provided one
+    const responseSessionId = response.headers.get(SESSION_ID_HEADER);
+    if (responseSessionId) {
+      setSessionId(responseSessionId);
+    }
+
     const data: ApiVerificationResponse = await response.json();
-    console.log('[Gateway] API response received:', data);
-
-    const result = VerificationResponseMapper.toDomain(data);
-    console.log('[Gateway] Mapped to domain:', result);
-
-    return result;
+    return VerificationResponseMapper.toDomain(data);
   }
 }
