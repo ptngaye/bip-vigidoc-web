@@ -100,15 +100,16 @@ function getTrustLevelInfo(trustLevel: string, verdict: string) {
         style: 'medium' as const,
         title: 'Format 2D-Doc détecté',
         subtitle: 'Structure du document reconnue comme compatible avec le standard 2D-Doc (ANTS).',
-        borderColor: 'border-slate-500',
-        textColor: 'text-slate-600',
-        iconBgColor: 'bg-slate-50',
+        borderColor: 'border-transparent', // Pas de bordure pour MEDIUM
+        textColor: 'text-primary-700',
+        iconBgColor: 'bg-primary-50',
+        // Icône œil/vigilance (observation, pas validation)
         icon: (
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
             strokeWidth={2}
-            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
           />
         ),
       };
@@ -167,10 +168,18 @@ function ResultDisplay({ result, onReset }: { result: VerificationResult; onRese
   const levelInfo = getTrustLevelInfo(result.trustLevel, result.verdict);
   const hasExtractedFields = Object.keys(result.extractedFields).length > 0;
 
+  // Background adapté selon le niveau
+  const getVerdictBackground = () => {
+    if (levelInfo.style === 'medium') return 'bg-gray-50'; // Fond neutre pour MEDIUM
+    return 'bg-white';
+  };
+
   return (
     <div className="space-y-4">
-      {/* Verdict principal - bordure colorée + fond blanc */}
-      <div className={`text-center p-6 rounded-xl border-2 bg-white ${levelInfo.borderColor}`}>
+      {/* Verdict principal */}
+      <div
+        className={`text-center p-6 rounded-xl border-2 ${getVerdictBackground()} ${levelInfo.borderColor}`}
+      >
         <div className="mb-4">
           <div
             className={`inline-flex items-center justify-center w-16 h-16 rounded-full ${levelInfo.iconBgColor}`}
@@ -188,6 +197,13 @@ function ResultDisplay({ result, onReset }: { result: VerificationResult; onRese
         <h3 className={`text-xl font-semibold mb-1 ${levelInfo.textColor}`}>{levelInfo.title}</h3>
         <p className="text-sm text-gray-500">{levelInfo.subtitle}</p>
       </div>
+
+      {/* Disclaimer légal - toujours visible */}
+      <p className="text-xs text-gray-500 text-center leading-relaxed">
+        Cette analyse atteste de la structure et, le cas échéant, de l&apos;intégrité
+        cryptographique du document. Elle ne constitue pas une validation administrative ou
+        juridique.
+      </p>
 
       {/* Bloc crypto - uniquement pour HIGH */}
       {levelInfo.style === 'high' && (
@@ -218,13 +234,13 @@ function ResultDisplay({ result, onReset }: { result: VerificationResult; onRese
         </div>
       )}
 
-      {/* Limites - pour MEDIUM */}
+      {/* Limites et points d'attention - pour MEDIUM */}
       {levelInfo.style === 'medium' && (
-        <div className="border border-slate-200 rounded-lg p-4 bg-slate-50/50">
-          <h4 className="text-xs font-semibold text-slate-700 uppercase tracking-wide mb-3">
-            Limites
+        <div className="border border-amber-200 rounded-lg p-4 bg-amber-50/50">
+          <h4 className="text-xs font-semibold text-amber-700 uppercase tracking-wide mb-3">
+            Limites et points d&apos;attention
           </h4>
-          <p className="text-sm text-slate-600 leading-relaxed">
+          <p className="text-sm text-amber-800 leading-relaxed">
             <strong className="block mb-1">
               Aucune signature cryptographique vérifiable n&apos;a été détectée à ce stade.
             </strong>
@@ -244,7 +260,7 @@ function ResultDisplay({ result, onReset }: { result: VerificationResult; onRese
         </div>
         {result.issuer && (
           <div className="flex justify-between text-sm">
-            <span className="text-gray-500">Émetteur</span>
+            <span className="text-gray-500">Émetteur détecté</span>
             <span className="font-medium text-gray-900">{result.issuer}</span>
           </div>
         )}
@@ -295,39 +311,26 @@ function ResultDisplay({ result, onReset }: { result: VerificationResult; onRese
         </CollapsibleSection>
       )}
 
-      {/* Métadonnées techniques (repliable) */}
+      {/* Métadonnées techniques (repliable) - ordre strict aligné extension */}
       <CollapsibleSection
         title="Métadonnées techniques"
         bgColor="bg-gray-100"
         textColor="text-gray-700"
       >
         <div className="space-y-2 text-sm">
+          {/* 1. Type de document */}
           <div className="flex justify-between">
-            <span className="text-gray-500">ID de vérification</span>
-            <span className="font-mono text-gray-900 text-xs">{result.verificationId}</span>
+            <span className="text-gray-500">Type de document</span>
+            <span className="font-medium text-gray-900">
+              {result.documentTypeLabel || result.detectedType || 'Non spécifié'}
+            </span>
           </div>
+          {/* 2. Émetteur détecté */}
           <div className="flex justify-between">
-            <span className="text-gray-500">Verdict</span>
-            <span className="font-medium text-gray-900">{result.verdict}</span>
+            <span className="text-gray-500">Émetteur détecté</span>
+            <span className="font-medium text-gray-900">{result.issuer || 'Non spécifié'}</span>
           </div>
-          <div className="flex justify-between">
-            <span className="text-gray-500">Niveau de confiance</span>
-            <span className="font-medium text-gray-900">{result.trustLevel}</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-gray-500">Type détecté</span>
-            <span className="font-medium text-gray-900">{result.detectedType}</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-gray-500">Famille</span>
-            <span className="font-medium text-gray-900">{result.documentFamily}</span>
-          </div>
-          {result.documentType && (
-            <div className="flex justify-between">
-              <span className="text-gray-500">Code type</span>
-              <span className="font-mono text-gray-900">{result.documentType}</span>
-            </div>
-          )}
+          {/* 3. Consulté le */}
           <div className="flex justify-between">
             <span className="text-gray-500">Consulté le</span>
             <span className="font-medium text-gray-900">
@@ -338,6 +341,19 @@ function ResultDisplay({ result, onReset }: { result: VerificationResult; onRese
               })}
             </span>
           </div>
+          {/* 4. Méthode de détection */}
+          <div className="flex justify-between">
+            <span className="text-gray-500">Méthode de détection</span>
+            <span className="font-medium text-gray-900">Lecture 2D-Doc</span>
+          </div>
+          {/* 5. Certificats ANTS (si applicable - HIGH uniquement) */}
+          {levelInfo.style === 'high' && (
+            <div className="flex justify-between">
+              <span className="text-gray-500">Certificats ANTS</span>
+              <span className="font-medium text-gray-900">À jour</span>
+            </div>
+          )}
+          {/* Séparateur fichier analysé */}
           {result.file && (
             <>
               <div className="border-t border-gray-200 pt-2 mt-2">
